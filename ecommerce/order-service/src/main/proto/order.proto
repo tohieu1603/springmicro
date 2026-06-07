@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package hieu.order.v1;
+
+option java_multiple_files = true;
+option java_package = "com.hieu.order_service.interfaces.grpc.proto";
+option java_outer_classname = "OrderProto";
+
+service OrderService {
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc GetOrderByNumber(GetOrderByNumberRequest) returns (GetOrderResponse);
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderByNumberRequest {
+  string order_number = 1;
+}
+
+message GetOrderResponse {
+  bool   found          = 1;
+  string id             = 2;
+  string order_number   = 3;
+  string user_id        = 4;
+  string status         = 5;
+  string total_amount   = 6;
+  string recipient_name = 7;
+  string recipient_phone = 8;
+  string address_line   = 9;
+  string ward           = 10;
+  string district       = 11;
+  string city           = 12;
+  repeated OrderItemSnapshot items = 13;
+}
+
+message OrderItemSnapshot {
+  string variant_id  = 1;
+  string sku         = 2;
+  int32  quantity    = 3;
+  string unit_price  = 4;
+}

@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package hieu.catalog.v1;
+
+option java_multiple_files = true;
+option java_package = "com.hieu.catalog_service.interfaces.grpc.proto";
+option java_outer_classname = "CatalogProto";
+
+// =====================================================================
+// CatalogService: inter-service product/variant lookups.
+//
+// Designed for low-latency calls from order-service, cart-service, and
+// inventory-service that would otherwise issue HTTP round-trips.
+// =====================================================================
+service CatalogService {
+  // Fetch a product (with variants) by its UUID string id.
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+
+  // Fetch a single variant by its SKU — common path for cart / order resolution.
+  rpc GetVariantBySku(GetVariantBySkuRequest) returns (GetVariantBySkuResponse);
+
+  // Return true if the SKU is ACTIVE and has at least `requested` units in stock.
+  rpc CheckStock(CheckStockRequest) returns (CheckStockResponse);
+}
+
+message GetProductRequest {
+  string product_id = 1;
+}
+
+message GetProductResponse {
+  bool   found = 1;
+  Product product = 2;
+}
+
+message GetVariantBySkuRequest {
+  string sku = 1;
+}
+
+message GetVariantBySkuResponse {
+  bool    found   = 1;
+  Variant variant = 2;
+}
+
+message CheckStockRequest {
+  string sku       = 1;
+  int32  requested = 2;
+}
+
+message CheckStockResponse {
+  bool   available = 1;
+  int32  quantity  = 2;
+  string status    = 3;  // ACTIVE | INACTIVE | OUT_OF_STOCK | ""
+}
+
+message Product {
+  string  id          = 1;
+  string  name        = 2;
+  string  slug        = 3;
+  string  description = 4;
+  string  category_id = 5;
+  string  brand       = 6;
+  string  thumbnail   = 7;
+  string  status      = 8;
+  repeated Variant variants = 9;
+}
+
+message Variant {
+  string id         = 1;
+  string product_id = 2;
+  string sku        = 3;
+  string price      = 4;   // BigDecimal serialised as string to preserve scale
+  string sale_price = 5;
+  int32  quantity   = 6;
+  string status     = 7;
+  repeated VariantAttr attrs = 8;
+}
+
+message VariantAttr {
+  string attr_id   = 1;
+  string attr_code = 2;
+  string attr_name = 3;
+  string val_id    = 4;
+  string val_text  = 5;
+}

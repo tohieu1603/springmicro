@@ -1,0 +1,318 @@
+Đi sâu: static, final, và combos của chúng
+1. Hiểu bản chất từng modifier ở mức JVM
+static — thuộc về Class, không thuộc Object
+Khi JVM load 1 class, nó tạo ra đúng 1 vùng nhớ cho các field static, nằm trong Metaspace (Java 8+). Tất cả instance share chung vùng nhớ này.
+
+
+public class Counter {
+    static int sharedCount = 0;   // 1 ô nhớ duy nhất cho cả class
+    int instanceCount = 0;        // mỗi object có 1 ô nhớ riêng
+}
+
+Counter a = new Counter();
+Counter b = new Counter();
+
+a.sharedCount++;   // sharedCount = 1
+b.sharedCount++;   // sharedCount = 2  (cùng ô nhớ!)
+
+a.instanceCount++; // a.instanceCount = 1
+b.instanceCount++; // b.instanceCount = 1 (ô nhớ khác)
+Hệ quả thực tế:
+
+static field tồn tại từ lúc class load đến lúc JVM shutdown → giữ tham chiếu lâu, có thể gây memory leak nếu trỏ vào object lớn.
+Truy cập static không cần new object: Counter.sharedCount.
+static method không thấy được this → không gọi được instance method/field bên trong.
+final — không cho gán lại
+final chỉ cấm gán lại reference, KHÔNG cấm thay đổi nội dung object:
+
+
+private final List<String> names = new ArrayList<>();
+
+names.add("hieu");        // OK — chỉ mutate list
+names = new ArrayList<>(); // ❌ compile error — gán lại reference
+→ Đây là bẫy nhiều người gặp: private final Map cache = ... không có nghĩa là cache bất biến, bạn vẫn có thể cache.put() thoải mái. Muốn thực sự bất biến phải dùng Map.of(), List.copyOf(), hoặc Immutable collections.
+
+final còn có 3 dạng:
+
+final field → không gán lại được sau khi khởi tạo (trong constructor hoặc inline).
+final method → subclass không override được.
+final class → không kế thừa được (ví dụ String, Integer).
+2. Phân tích chi tiết 4 combo
+a) private final — Instance field bất biến (dependency injection)
+
+@Service
+@RequiredArgsConstructor
+public class TokenBlacklistService {
+    private final StringRedisTemplate redisTemplate;
+    private final TokenRevocationJpaRepository repository;
+}
+Tại sao là pattern chuẩn cho DI?
+
+Thread-safe miễn phí: Java Memory Model đảm bảo final field được safely published — sau khi constructor return, mọi thread đọc field này thấy giá trị đã được khởi tạo đầy đủ, KHÔNG cần volatile hay synchronized.
+
+→ Đây là điểm cực kỳ quan trọng với Spring bean (mặc định singleton, shared across threads).
+
+Fail-fast nếu thiếu dependency: Constructor injection + final → nếu Spring không inject được, app crash lúc start, không phải lúc runtime.
+
+Tương thích Lombok @RequiredArgsConstructor: Lombok scan các field final (và @NonNull) → sinh constructor tự động.
+
+Dễ test: Có constructor → new TokenBlacklistService(mockRedis, mockRepo) trong unit test, không cần @Autowired reflection.
+
+Khi nào KHÔNG dùng final?
+
+Field cần được set qua setter (legacy code, framework yêu cầu).
+Field có thể null tùy môi trường (optional dependency).
+Field thay đổi theo state máy (counter, cache reference được swap).
+b) private static final — Hằng số nội bộ của class
+
+private static final String BLACKLIST_PREFIX = "blacklist:";
+private static final long CLEANUP_INTERVAL_MS = 3_600_000L;
+private static final Duration DEFAULT_TTL = Duration.ofMinutes(15);
+Đặc điểm:
+
+Chỉ có 1 bản trong JVM, share giữa mọi instance.
+Không gán lại được → thread-safe tuyệt đối (nếu giá trị là immutable type).
+Convention: SCREAMING_SNAKE_CASE.
+Khi nào dùng?
+
+Magic strings/numbers: prefix, suffix, header name, key Redis/Kafka topic.
+Configuration constant không đổi: MAX_RETRY = 3, TIMEOUT_MS = 5000.
+Pre-compiled regex (rất quan trọng về performance):
+
+private static final Pattern EMAIL = Pattern.compile("^[\\w.-]+@...");
+Nếu compile regex inline mỗi lần gọi method → cực chậm.
+Logger:
+
+private static final Logger log = LoggerFactory.getLogger(MyService.class);
+(Lombok @Slf4j chính là gen ra dòng này.)
+Cảnh báo về mutable static final:
+
+
+private static final Map<String, String> CACHE = new HashMap<>();  // ❌ NGUY HIỂM
+CACHE reference không đổi → đúng là final.
+Nhưng nội dung map thì mọi thread mutate được → race condition, ConcurrentModificationException.
+Nếu phải dùng: ConcurrentHashMap, hoặc Map.of(...) cho immutable.
+c) public static final — Hằng số chia sẻ ra ngoài
+
+public static final String API_VERSION = "v1";
+public static final int MAX_PAGE_SIZE = 100;
+Khi nào dùng?
+
+Constant cần truy cập từ class khác mà không muốn tạo getter.
+Hằng số trong interface (mặc định đã là public static final, không cần ghi):
+
+public interface Constants {
+    String DEFAULT_LOCALE = "vi-VN";   // tự động public static final
+}
+Best practice hiện đại:
+
+Với Java 14+ → ưu tiên enum hoặc record thay vì hằng số rời rạc.
+Đừng làm "Constants utility class" chứa cả trăm hằng số không liên quan → khó maintain.
+d) static final không modifier (package-private)
+
+static final int INTERNAL_BUFFER_SIZE = 8192;
+Truy cập được trong cùng package.
+Hiếm khi dùng chủ động — thường là test code muốn các class trong cùng package test set/read.
+3. Trường hợp dễ nhầm — đi sâu
+Nhầm 1: static field có Spring inject không?
+
+@Service
+public class MyService {
+    @Autowired
+    private static RedisTemplate redis;   // ❌ KHÔNG inject!
+}
+Spring không inject vào static field vì DI hoạt động qua object (instance), không qua class. Đây là lỗi phổ biến của junior dev.
+
+Workaround (anti-pattern, tránh nếu có thể):
+
+
+private static RedisTemplate redis;
+
+@Autowired
+public void setRedis(RedisTemplate r) {
+    MyService.redis = r;   // hack
+}
+→ Nếu thấy mình cần làm thế này, thiết kế đang sai — refactor để dùng instance method.
+
+Nhầm 2: final parameter và final local variable
+
+public void process(final String input) {
+    final int retry = 3;
+    input = "new";   // ❌ error
+    retry = 5;       // ❌ error
+}
+final parameter/local: chủ yếu cho readability, hoặc khi dùng trong lambda/anonymous class:
+
+String name = "hieu";
+Runnable r = () -> System.out.println(name);  // name phải effectively final
+Nhiều team yêu cầu mark final cho mọi local var → quan điểm cá nhân, không bắt buộc.
+Nhầm 3: static final với object reference
+
+public static final List<String> ROLES = new ArrayList<>(List.of("ADMIN", "USER"));
+ROLES reference không đổi.
+Nhưng ai cũng có thể MyClass.ROLES.add("HACKER") → BUG bảo mật!
+Đúng:
+
+
+public static final List<String> ROLES = List.of("ADMIN", "USER");  // immutable
+// hoặc
+public static final List<String> ROLES = 
+    Collections.unmodifiableList(Arrays.asList("ADMIN", "USER"));
+Nhầm 4: final với primitive vs object
+
+private static final int MAX = 100;        // value thực sự không đổi
+private static final Date EPOCH = new Date(0);  // reference cố định, nội dung MUTABLE!
+
+EPOCH.setTime(999);  // ✅ compile OK, nhưng phá hỏng "hằng số"
+→ Với object mutable (Date, Calendar, StringBuilder), final chỉ là cảm giác an toàn giả. Dùng các loại immutable: Instant, LocalDate, String.
+
+4. Quyết định nhanh — flowchart
+
+Field này là gì?
+│
+├─ Hằng số (giá trị cố định, không phụ thuộc instance)
+│   ├─ Chỉ class này dùng     → private static final
+│   ├─ Class khác cần đọc     → public static final (hoặc enum)
+│   └─ Trong interface         → static final (tự động)
+│
+├─ Dependency được Spring inject
+│   └─ → private final  (constructor injection)
+│
+├─ State thay đổi theo thời gian (counter, cache, flag)
+│   ├─ Single-thread           → private
+│   ├─ Multi-thread, atomic   → private volatile / AtomicXxx
+│   └─ Multi-thread, complex  → private final ConcurrentXxx
+│
+└─ Logger
+    └─ → private static final Logger log = ...
+        (hoặc dùng Lombok @Slf4j)
+5. Trong codebase của bạn — ví dụ thực tế
+Quay lại TokenBlacklistService.java:
+
+
+@Slf4j                                    // Lombok gen: private static final Logger log
+@Service
+@RequiredArgsConstructor                  // Lombok gen constructor cho mọi private final
+public class TokenBlacklistService {
+
+    private static final String BLACKLIST_PREFIX = "blacklist:";
+    //      ↑ hằng số: 1 bản trong JVM, không bao giờ đổi, chỉ class này dùng
+
+    private final StringRedisTemplate redisTemplate;
+    private final TokenRevocationJpaRepository tokenRevocationRepository;
+    //      ↑ dependency: mỗi bean Spring inject vào, không gán lại được
+    //        → thread-safe, fail-fast, testable
+}
+Đây là pattern chuẩn cho mọi Spring service hiện đại — gặp ở 90% codebase Java enterprise. Nắm vững combo này là bạn đọc/viết Spring rất nhanh.
+
+tôi thấy vẫn khá khó hiểu
+Giải thích lại bằng ví dụ đời thường
+Quên hết những thứ phức tạp đi. Tôi dùng ẩn dụ quán cà phê để bạn hiểu.
+
+Hình dung: Bạn mở 1 quán cà phê
+Class QuanCaPhe = bản thiết kế quán.
+Mỗi new QuanCaPhe() = mở 1 chi nhánh mới.
+
+
+public class QuanCaPhe {
+    String tenChiNhanh;      // mỗi chi nhánh có tên riêng
+    int soBan;               // mỗi chi nhánh có số bàn riêng
+}
+Mở 2 chi nhánh:
+
+
+QuanCaPhe q1 = new QuanCaPhe();  // chi nhánh Quận 1
+QuanCaPhe q2 = new QuanCaPhe();  // chi nhánh Quận 3
+→ q1.tenChiNhanh và q2.tenChiNhanh là 2 thứ khác nhau. Đây là field bình thường (không static).
+
+static = "Cái chung của cả thương hiệu, không phải của riêng chi nhánh nào"
+
+public class QuanCaPhe {
+    static String tenThuongHieu = "Highlands";  // ← cả hệ thống chỉ có 1 cái tên
+    String tenChiNhanh;                          // ← mỗi chi nhánh tên khác nhau
+}
+tenThuongHieu là "Highlands" — chi nhánh nào cũng vậy. Đổi tên thương hiệu → cả hệ thống đổi theo.
+tenChiNhanh thì mỗi nơi 1 kiểu: "Highlands Bitexco", "Highlands Vincom"...
+Nhớ: static = "thuộc về cả thương hiệu", không có static = "thuộc về riêng chi nhánh".
+
+final = "Khắc vào đá, không sửa được nữa"
+
+final String tenThuongHieu = "Highlands";
+tenThuongHieu = "Starbucks";  // ❌ LỖI — đã khắc đá rồi, không đổi được
+Nhớ: final = không cho gán lại. Như xăm hình lên tay — xăm rồi thì thôi.
+
+Giờ ghép 2 cái lại — 3 trường hợp thường gặp
+🔵 Trường hợp 1: private static final = "Quy định của thương hiệu, vĩnh viễn không đổi"
+
+private static final String SLOGAN = "Cà phê đậm chất Việt";
+static → cả thương hiệu xài chung (không riêng chi nhánh nào)
+final → không đổi được
+private → người ngoài không thấy
+→ Đây là HẰNG SỐ. Như slogan thương hiệu — viết 1 lần, dùng mãi mãi, mọi chi nhánh giống nhau.
+
+Trong code của bạn:
+
+
+private static final String BLACKLIST_PREFIX = "blacklist:";
+→ Prefix Redis luôn là "blacklist:", không bao giờ đổi, dùng chung khắp class.
+
+🟢 Trường hợp 2: private final = "Mỗi chi nhánh có 1 cái, lắp 1 lần, không tháo ra được"
+
+private final String diaChi;  // mỗi chi nhánh 1 địa chỉ
+KHÔNG có static → mỗi chi nhánh (instance) có riêng
+final → lắp xong là cố định, không sửa
+private → giấu bên trong
+→ Như địa chỉ chi nhánh: Chi nhánh Quận 1 ở "123 Lê Lợi", chi nhánh Quận 3 ở "456 CMT8". Mỗi nơi 1 địa chỉ riêng, nhưng đã đăng ký rồi thì không đổi được.
+
+Trong code của bạn:
+
+
+private final StringRedisTemplate redisTemplate;
+→ Mỗi service instance được Spring "lắp" cho 1 redisTemplate khi tạo ra. Lắp xong là khoá luôn.
+
+🟡 Trường hợp 3: private (không có gì khác) = "Mỗi chi nhánh có 1, đổi thoải mái"
+
+private int khachHomNay;  // mỗi chi nhánh đếm khách riêng, thay đổi liên tục
+→ Như số khách trong ngày: mỗi chi nhánh đếm riêng, và liên tục tăng theo từng khách bước vào.
+
+So sánh trực quan
+Code	Ẩn dụ
+private static final String SLOGAN = "..."	Slogan thương hiệu — cả hệ thống xài chung, vĩnh viễn
+private final String diaChi	Địa chỉ chi nhánh — riêng từng nơi, đăng ký rồi không đổi
+private int khachHomNay	Số khách hôm nay — riêng từng nơi, đổi liên tục
+static int tongChiNhanh	Tổng số chi nhánh — cả hệ thống có 1 con số, có thể đổi khi mở thêm
+Quy tắc 30 giây — hỏi 2 câu
+Mỗi khi viết field, hỏi:
+
+Câu 1: Cái này dùng chung cho cả CLASS, hay riêng cho từng OBJECT?
+
+Dùng chung → thêm static
+Riêng từng cái → không static
+Câu 2: Sau khi gán giá trị xong, có cần đổi nữa không?
+
+Không đổi nữa → thêm final
+Còn đổi → không final
+Xong. Ghép lại là ra:
+
+Dùng chung?	Đổi được?	Kết quả
+Có	Không	static final (hằng số)
+Có	Có	static (đếm tổng, hiếm dùng)
+Không	Không	final (dependency inject)
+Không	Có	(không gì cả) (state thay đổi)
+Thêm private ở trước để giấu khỏi class khác → xong.
+
+Áp dụng vào file bạn đang đọc
+
+public class TokenBlacklistService {
+
+    private static final String BLACKLIST_PREFIX = "blacklist:";
+    // Hỏi: Dùng chung? CÓ (mọi instance đều dùng prefix này)
+    //      Đổi được? KHÔNG (prefix Redis cố định)
+    // → static final ✓
+
+    private final StringRedisTemplate redisTemplate;
+    // Hỏi: Dùng chung? KHÔNG (mỗi service được inject riêng)
+    //      Đổi được? KHÔNG (Spring inject 1 lần, không thay)
+    // → final (không static) ✓
+}
+Bạn thấy đỡ rối chưa? Nếu vẫn còn chỗ nào lăn tăn cứ chỉ thẳng vào dòng code, tôi giải thích cho dòng đó.

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d8dadc",
+                        "error": "#ba1a1a",
+                        "on-surface": "#191c1e",
+                        "on-background": "#191c1e",
+                        "on-tertiary-fixed": "#111c2c",
+                        "on-secondary-fixed-variant": "#832600",
+                        "outline": "#74777d",
+                        "outline-variant": "#c4c6cd",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-container": "#5d1900",
+                        "primary-fixed-dim": "#b7c8de",
+                        "on-tertiary-container": "#8691a6",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "tertiary": "#0a1526",
+                        "background": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3133",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary-container": "#8192a7",
+                        "primary-fixed": "#d2e4fb",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "primary": "#041627",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed": "#390c00",
+                        "secondary-container": "#fe6a34",
+                        "surface-container-high": "#e6e8ea",
+                        "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#38485a",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary-container": "#1f2a3b",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b7c8de",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed": "#d8e3fa",
+                        "tertiary-fixed-dim": "#bcc7dd",
+                        "primary-container": "#1a2b3c",
+                        "on-primary-fixed": "#0b1d2d",
+                        "surface-tint": "#4f6073",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#44474c",
+                        "secondary-fixed": "#ffdbd0",
+                        "secondary": "#ab3500",
+                        "surface-container-highest": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "stack-sm": "8px",
+                        "stack-xs": "4px",
+                        "stack-md": "16px",
+                        "stack-xl": "48px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "h3-desktop": ["Inter"],
+                        "price-display": ["Inter"],
+                        "h1-desktop": ["Inter"],
+                        "h2-desktop": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h1-mobile": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h3-desktop": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "price-display": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "h1-desktop": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h2-desktop": ["36px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "h1-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<div class="font-h3-desktop text-h3-desktop font-bold text-primary">LUXURY MART</div>
+<nav class="hidden md:flex items-center space-x-gutter">
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors duration-200" href="#">Trang chủ</a>
+<a class="text-secondary border-b-2 border-secondary font-label-bold py-1" href="#">Danh mục</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors duration-200" href="#">Khuyến mãi</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors duration-200" href="#">Tin tức</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors duration-200" href="#">Liên hệ</a>
+</nav>
+<div class="flex items-center space-x-stack-md">
+<button class="p-2 text-on-surface hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+<button class="p-2 text-on-surface hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+<div class="relative">
+<button class="p-2 text-on-surface hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+</button>
+<span class="absolute top-0 right-0 bg-secondary text-on-primary text-[10px] font-bold px-1 rounded-full">3</span>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-xl">
+<!-- Breadcrumbs & Title -->
+<div class="mb-stack-lg">
+<div class="flex items-center text-body-sm text-on-surface-variant mb-stack-xs">
+<span>Trang chủ</span>
+<span class="material-symbols-outlined text-[16px] mx-1">chevron_right</span>
+<span class="text-primary font-label-bold">Sản phẩm công nghệ</span>
+</div>
+<h1 class="font-h2-desktop text-h2-desktop text-primary">Điện thoại &amp; Thiết bị di động</h1>
+</div>
+<div class="flex flex-col md:flex-row gap-gutter">
+<!-- Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 space-y-stack-lg">
+<div class="bg-surface-container-lowest p-stack-md border border-outline-variant rounded-lg">
+<h3 class="font-label-bold text-primary mb-stack-md uppercase tracking-wider">Danh mục</h3>
+<ul class="space-y-stack-sm">
+<li class="flex items-center justify-between group cursor-pointer">
+<span class="font-body-md text-on-surface-variant group-hover:text-secondary transition-colors">Điện thoại</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">smartphone</span>
+</li>
+<li class="flex items-center justify-between group cursor-pointer">
+<span class="font-body-md text-on-surface-variant group-hover:text-secondary transition-colors">Máy tính</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">laptop</span>
+</li>
+<li class="flex items-center justify-between group cursor-pointer">
+<span class="font-body-md text-on-surface-variant group-hover:text-secondary transition-colors">Đồng hồ</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">watch</span>
+</li>
+<li class="flex items-center justify-between group cursor-pointer">
+<span class="font-body-md text-on-surface-variant group-hover:text-secondary transition-colors">Âm thanh</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">headphones</span>
+</li>
+</ul>
+</div>
+<div class="bg-surface-container-lowest p-stack-md border border-outline-variant rounded-lg">
+<h3 class="font-label-bold text-primary mb-stack-md uppercase tracking-wider">Khoảng giá</h3>
+<div class="space-y-stack-md">
+<div class="flex gap-stack-sm">
+<input class="w-full border border-outline-variant rounded p-stack-xs font-body-sm focus:border-primary outline-none" placeholder="Từ" type="text"/>
+<input class="w-full border border-outline-variant rounded p-stack-xs font-body-sm focus:border-primary outline-none" placeholder="Đến" type="text"/>
+</div>
+<button class="w-full bg-primary text-on-primary py-stack-xs font-label-bold rounded hover:opacity-90 transition-all">Áp dụng</button>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-stack-md border border-outline-variant rounded-lg">
+<h3 class="font-label-bold text-primary mb-stack-md uppercase tracking-wider">Thương hiệu</h3>
+<div class="space-y-stack-sm">
+<label class="flex items-center gap-stack-sm cursor-pointer">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface-variant">Apple</span>
+</label>
+<label class="flex items-center gap-stack-sm cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface-variant">Samsung</span>
+</label>
+<label class="flex items-center gap-stack-sm cursor-pointer">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md text-on-surface-variant">Sony</span>
+</label>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-stack-md border border-outline-variant rounded-lg">
+<h3 class="font-label-bold text-primary mb-stack-md uppercase tracking-wider">Đánh giá</h3>
+<div class="space-y-stack-sm">
+<button class="flex items-center gap-1 group">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-body-sm text-on-surface-variant ml-1">trở lên</span>
+</button>
+<button class="flex items-center gap-1 group">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-outline-variant">star</span>
+<span class="text-body-sm text-on-surface-variant ml-1">trở lên</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Product Grid Section -->
+<section class="flex-1">
+<!-- Toolbar -->
+<div class="bg-surface-container-lowest border border-outline-variant p-stack-sm rounded-lg mb-stack-lg flex flex-col md:flex-row md:items-center justify-between gap-stack-md">
+<div class="text-body-md text-on-surface-variant">
+                        Hiển thị <span class="font-label-bold text-primary">1-12</span> trong số <span class="font-label-bold text-primary">48</span> sản phẩm
+                    </div>
+<div class="flex items-center gap-stack-md">
+<span class="font-label-bold text-primary text-body-sm">Sắp xếp:</span>
+<select class="bg-transparent border-none font-body-sm text-on-surface-variant focus:ring-0 cursor-pointer">
+<option>Mới nhất</option>
+<option>Giá: Thấp đến Cao</option>
+<option>Giá: Cao đến Thấp</option>
+<option>Bán chạy nhất</option>
+</select>
+<div class="h-6 w-px bg-outline-variant hidden md:block"></div>
+<div class="flex gap-2">
+<button class="p-1 text-primary"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-1 text-outline-variant hover:text-primary"><span class="material-symbols-outlined">view_list</span></button>
+</div>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Product Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-all flex flex-col h-full">
+<div class="aspect-square bg-surface-container p-stack-md relative overflow-hidden">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" data-alt="A professional studio product shot of a sleek flagship smartphone with a large vibrant screen and triple lens camera system. The device is placed against a minimalist light grey background with soft cinematic lighting that highlights its premium glass and metal build. The overall aesthetic is clean, modern, and high-end retail quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS2mv-xkHJpMHjrIHsYo5-ift6d17a1OQFDdH0NVp710zL_hp9w-JltCxrDOv3GvDZb8wO9H2oWEkC4gLvWaN4aLVLLDvKjEZL9LMBot8pNZzfGxbeQkSXemqmOWM6dPwJkXy6Ns2_iiHCFobGrp-Dpb3ny300P8t--b6X3-E3JU4B0Dcpwr5AFABx_PL0Zu6gZ284SEhhhcE-1U7q4rbTFV-t6ZIxiQBuuylKJlBRmEhRgihj6jpfMJvfH1msBs-dWtgpOuE0K7sU"/>
+<div class="absolute top-2 left-2 flex flex-col gap-1">
+<span class="bg-secondary px-2 py-0.5 text-[10px] font-bold text-on-primary rounded uppercase">Giảm 15%</span>
+<span class="bg-green-600 px-2 py-0.5 text-[10px] font-bold text-white rounded uppercase">Mới</span>
+</div>
+</div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="text-body-sm text-outline-variant mb-1">Samsung</div>
+<h3 class="font-body-md text-on-surface line-clamp-2 mb-stack-md flex-1">Galaxy S23 Ultra 5G - 256GB Chính hãng</h3>
+<div class="flex flex-col gap-1">
+<span class="text-secondary font-price-display text-price-display">24.990.000₫</span>
+<span class="text-body-sm text-outline-variant line-through">29.990.000₫</span>
+</div>
+<button class="mt-stack-md w-full bg-primary text-on-primary py-stack-sm rounded font-label-bold hover:bg-primary-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">shopping_basket</span>
+                                Thêm vào giỏ
+                            </button>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-all flex flex-col h-full">
+<div class="aspect-square bg-surface-container p-stack-md relative overflow-hidden">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" data-alt="A high-resolution product image of a premium smartwatch featuring a sleek metallic body and a sophisticated leather strap. The screen displays a complex watch face with glowing health metrics and time. The lighting is crisp and detailed, showcasing the texture of the materials against a neutral studio backdrop in a high-conversion e-commerce style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAihDkbOLaxv6RzK73My6ICn7LOfVXpUDHyTRvJsLFQ-chqv1m4em5nVC3-5w6ckuSmwnQzJiuXXJ1xwykvnvtYtREWJIPpDN7NmrCLQ6cq1I6qkhUWZeBhgmLnpThMkjO9QRLBualydpNzPnzGWmrDrOB_zVDnGCtnS-inIkxide2OqvmNHcGxSppYXaSMm9GoF-crapFAr_EFQ6GubzwPo-ZrewBQo3V6z0q4siwXGdbeDHaQlCKA5ZCuEE7iyMOozPECh4J_GaS6"/>
+</div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="text-body-sm text-outline-variant mb-1">Apple</div>
+<h3 class="font-body-md text-on-surface line-clamp-2 mb-stack-md flex-1">Apple Watch Series 9 GPS 41mm Viền nhôm</h3>
+<div class="flex flex-col gap-1">
+<span class="text-secondary font-price-display text-price-display">9.490.000₫</span>
+</div>
+<button class="mt-stack-md w-full border border-primary text-primary py-stack-sm rounded font-label-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">shopping_basket</span>
+                                Thêm vào giỏ
+                            </button>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-all flex flex-col h-full">
+<div class="aspect-square bg-surface-container p-stack-md relative overflow-hidden">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" data-alt="Modern noise-cancelling wireless headphones presented in a clean studio environment. The headphones feature a minimalist design with premium matte finishes and soft ear cushions. The lighting is soft and even, highlighting the sleek curves and metallic accents. The overall look is professional and targeted at audiophiles in a luxury marketplace setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJEf-yI6WIPDSMKWVdLyGdjB-cfCUfmSbcqPucSCGf4SQlgNx6Ph96kapdHbBN8z7c_S7XX05NHp3u6w6TsCDVKBVSxRIad3mRhv6siRoaCU3EeS6Lbh_Om4CbVL0gYbWUkN8SmcQ5tge1ccufygClD3T-MJTWrqoR59rYX_roMW00TcX_dIrJaVtSWtn_zgLl8GixWsnuBisgMWH33U92N6bdBD4iN6imwShFiti9iG3ZunYrbdGTq4arU3iNnQAi0F1l7yOZALo3"/>
+<div class="absolute top-2 right-2">
+<span class="bg-error text-on-error px-2 py-0.5 text-[10px] font-bold rounded uppercase">Hot</span>
+</div>
+</div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="text-body-sm text-outline-variant mb-1">Sony</div>
+<h3 class="font-body-md text-on-surface line-clamp-2 mb-stack-md flex-1">Tai nghe chống ồn Sony WH-1000XM5</h3>
+<div class="flex flex-col gap-1">
+<span class="text-secondary font-price-display text-price-display">7.690.000₫</span>
+</div>
+<button class="mt-stack-md w-full bg-primary text-on-primary py-stack-sm rounded font-label-bold hover:bg-primary-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">shopping_basket</span>
+                                Thêm vào giỏ
+                            </button>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-all flex flex-col h-full">
+<div class="aspect-square bg-surface-container p-stack-md relative overflow-hidden">
+<img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" data-alt="A professional laptop product image showcasing a thin, elegant aluminum chassis and a high-resolution retina display. The screen shows a bright, colorful desktop environment. The laptop is set in a bright, modern office-like studio setting with professional top-down lighting and sharp focus on the keyboard and trackpad details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqbWU57ebdLPmHrVwqOyT5JlDURvgUH-OiL8ZNPM6zntXfR5Qrn2lVqJZyj_Zo6QJsxXIDoTWybrBh7g_7qyzfEK2U1_yG75h88JJR5Rl487v8nC79tnlX-zfkTyZq5Kfia3XD2cV82o49EixRq75iWPtBsY-06-2JGyOjOkB3TWZGuiqvJxIRFImp92BMdwqkZcWAJ0HmCyGGuf4IO3WVcRE7maMh3u9bgrqtZedc3jaESM5vU0R0IQjxKnpVbwA8d__9aFdrRSle"/>
+</div>
+<div class="p-stack-md flex-1 flex flex-col">
+<div class="text-body-sm text-outline-variant mb-1">Apple</div>
+<h3 class="font-body-md text-on-surface line-clamp-2 mb-stack-md flex-1">MacBook Air M2 8GB/256GB - 13.6 inch Chính hãng</h3>
+<div class="flex flex-col gap-1">
+<span class="text-secondary font-price-display text-price-display">25.490.000₫</span>
+<span class="text-body-sm text-outline-variant line-through">27.990.000₫</span>
+</div>
+<button class="mt-stack-md w-full bg-primary text-on-primary py-stack-sm rounded font-label-bold hover:bg-primary-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">shopping_basket</span>
+                                Thêm vào giỏ
+                            </button>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-stack-xl flex items-center justify-center gap-stack-sm">
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded text-on-surface hover:border-primary transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center bg-primary text-on-primary rounded font-label-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded text-on-surface hover:border-primary transition-all">2</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded text-on-surface hover:border-primary transition-all">3</button>
+<span class="px-2 text-outline-variant">...</span>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded text-on-surface hover:border-primary transition-all">12</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded text-on-surface hover:border-primary transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-primary py-stack-xl">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-stack-xl mb-stack-xl">
+<div class="md:col-span-1">
+<h2 class="font-h2-desktop text-h2-desktop font-bold text-on-primary mb-stack-md">LUXURY MART</h2>
+<p class="text-surface-variant font-body-sm leading-relaxed">Đơn vị bán lẻ thiết bị công nghệ hàng đầu, cam kết cung cấp sản phẩm chính hãng và dịch vụ hậu mãi chuyên nghiệp nhất.</p>
+</div>
+<div class="text-on-primary">
+<h4 class="font-label-bold mb-stack-md uppercase tracking-wider">Hỗ trợ khách hàng</h4>
+<ul class="space-y-stack-sm text-surface-variant font-body-sm">
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Câu hỏi thường gặp</li>
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Chính sách bảo hành</li>
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Giao hàng &amp; Trả hàng</li>
+</ul>
+</div>
+<div class="text-on-primary">
+<h4 class="font-label-bold mb-stack-md uppercase tracking-wider">Về chúng tôi</h4>
+<ul class="space-y-stack-sm text-surface-variant font-body-sm">
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Giới thiệu</li>
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Điều khoản sử dụng</li>
+<li class="hover:text-secondary-container cursor-pointer transition-colors">Chính sách bảo mật</li>
+</ul>
+</div>
+<div class="text-on-primary">
+<h4 class="font-label-bold mb-stack-md uppercase tracking-wider">Bản tin</h4>
+<p class="text-surface-variant font-body-sm mb-stack-md">Đăng ký để nhận thông tin khuyến mãi mới nhất.</p>
+<div class="flex border border-outline-variant rounded overflow-hidden">
+<input class="bg-transparent border-none w-full px-stack-sm text-body-sm focus:ring-0" placeholder="Email của bạn" type="email"/>
+<button class="bg-secondary-container text-on-secondary-container px-stack-md py-stack-xs font-label-bold">Gửi</button>
+</div>
+</div>
+</div>
+<div class="border-t border-primary-container pt-stack-lg flex flex-col md:flex-row justify-between items-center gap-stack-md">
+<p class="text-surface-variant font-body-sm">© 2024 Luxury Mart. Tất cả quyền được bảo lưu.</p>
+<div class="flex gap-stack-lg text-surface-variant font-body-sm">
+<span class="hover:text-on-primary cursor-pointer">Facebook</span>
+<span class="hover:text-on-primary cursor-pointer">Instagram</span>
+<span class="hover:text-on-primary cursor-pointer">Youtube</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: #f7f9fb;
+  color: #191c1e;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Symbols hook for icon use in the original mock. */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-family: "Material Symbols Outlined";
+}
+
+/* Public-page surface utility used by hero / sections. */
+.surface-soft {
+  background-color: #F8FAFC;
+}
+
+/* Hide the antd default font import warning in dev — antd works without it. */
+.ant-message,
+.ant-notification,
+.ant-modal-mask {
+  z-index: 2000 !important;
+}
+
+/* Soft scrollbar that doesn't fight Tailwind utilities. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c4c6cd;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #74777d;
+}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package hieu.cart.v1;
+
+option java_multiple_files = true;
+option java_package = "com.hieu.cart_service.interfaces.grpc.proto";
+option java_outer_classname = "CartProto";
+
+// =====================================================================
+// CartService: inter-service cart operations.
+//
+// Called by order-service to read/clear a user's cart before
+// placing an order, avoiding duplicate HTTP round-trips.
+// =====================================================================
+service CartService {
+  // Returns all cart items for the given user.
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+
+  // Removes all items from the user's cart (post-order placement).
+  rpc ClearCart(ClearCartRequest) returns (ClearCartResponse);
+}
+
+message GetCartRequest {
+  string user_id = 1;
+}
+
+message GetCartResponse {
+  string user_id      = 1;
+  repeated CartItemSnapshot items = 2;
+}
+
+message ClearCartRequest {
+  string user_id = 1;
+}
+
+message ClearCartResponse {
+  bool success = 1;
+}
+
+message CartItemSnapshot {
+  string id            = 1;
+  string user_id       = 2;
+  string product_id    = 3;
+  string product_name  = 4;
+  string variant_id    = 5;
+  string variant_sku   = 6;
+  string variant_image = 7;
+  string unit_price    = 8;  // BigDecimal as string
+  int32  quantity      = 9;
+}

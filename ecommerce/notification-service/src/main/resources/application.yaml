@@ -1,0 +1,80 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: notification-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/notificationdb}
+      auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    consumer:
+      group-id: notification-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: java.util.HashMap
+        spring.json.trusted.packages: com.hieu.*
+    listener:
+      missing-topics-fatal: false
+      concurrency: ${KAFKA_CONCURRENCY:3}
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+          connectiontimeout: 5000
+          timeout: 10000
+          writetimeout: 10000
+  grpc:
+    client:
+      user-profile-service:
+        address: static://localhost:9099
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${SERVER_PORT:8090}
+jwt:
+  secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-please-32chars}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://admin:admin123@localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+logging:
+  level:
+    com.hieu.notification_service: DEBUG
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: WARN
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{30} - %msg%n'

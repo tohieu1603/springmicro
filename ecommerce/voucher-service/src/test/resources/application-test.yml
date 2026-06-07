@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    show-sql: false
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+
+jwt:
+  secret: test-secret-test-secret-test-secret-1234
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false

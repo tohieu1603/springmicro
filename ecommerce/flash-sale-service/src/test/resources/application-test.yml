@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: false
+
+jwt:
+  secret: test-secret-test-secret-test-secret-1234
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false

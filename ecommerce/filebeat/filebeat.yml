@@ -1,0 +1,57 @@
+# Filebeat scrape:
+#   1) File logs từ host /Users/admin/HieuTo/ecommerce/logs/*.log (Spring Boot native processes)
+#   2) Container stdout của Docker infra (Postgres, Kafka, ES, Kibana, ...) qua autodiscover
+# Output → Elasticsearch index logs-YYYY.MM.dd, Kibana data view "logs-*" đọc.
+
+filebeat.inputs:
+  # Spring Boot services chạy native ngoài Docker — log files mounted vào /var/log/services
+  - type: filestream
+    id: spring-boot-services
+    paths:
+      - /var/log/services/*.log
+    fields:
+      log_source: spring-boot
+      env: dev
+    fields_under_root: true
+    # service tên = filename không có .log (catalog-service.log → catalog-service)
+    processors:
+      - dissect:
+          tokenizer: "/var/log/services/%{service.name}.log"
+          field: "log.file.path"
+          target_prefix: ""
+
+# Docker container logs (Postgres, Kafka, Redis, ES, Kibana...) qua autodiscover
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      templates:
+        - condition:
+            contains:
+              docker.container.image: "hieu-"
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+
+processors:
+  - add_docker_metadata: ~
+  - add_host_metadata: ~
+  # Drop ANSI color escapes
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+          var msg = event.Get("message");
+          if (msg) { event.Put("message", String(msg).replace(/\x1B\[[0-9;]*[A-Za-z]/g, "")); }
+        }
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "logs-%{+yyyy.MM.dd}"
+
+setup.template.name: "logs"
+setup.template.pattern: "logs-*"
+setup.ilm.enabled: false
+
+logging.level: info

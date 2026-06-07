@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package hieu.userprofile.v1;
+
+option java_package = "com.hieu.user_profile_service.grpc";
+option java_outer_classname = "UserProfileProto";
+option java_multiple_files = true;
+
+service UserProfileService {
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc GetEmail(GetEmailRequest) returns (GetEmailResponse);
+  rpc GetAddress(GetAddressRequest) returns (GetAddressResponse);
+}
+
+message GetProfileRequest { string user_id = 1; }
+message GetProfileResponse {
+  bool found = 1;
+  string user_id = 2;
+  string email = 3;
+  string phone = 4;
+  string first_name = 5;
+  string last_name = 6;
+  string avatar_url = 7;
+}
+
+message GetEmailRequest { string user_id = 1; }
+message GetEmailResponse {
+  bool found = 1;
+  string email = 2;
+}
+
+message GetAddressRequest {
+  string user_id = 1;
+  string address_id = 2;
+}
+message GetAddressResponse {
+  bool found = 1;
+  string id = 2;
+  string recipient_name = 3;
+  string recipient_phone = 4;
+  string street = 5;
+  string ward = 6;
+  string district = 7;
+  string city = 8;
+  string country = 9;
+  string postal_code = 10;
+}

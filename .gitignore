@@ -1,0 +1,102 @@
+# =====================================================================
+# Root .gitignore — monorepo: Spring Boot (Maven) backend + Next.js FE
+# =====================================================================
+
+# ---------- OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ---------- IDE / Editors ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.factorypath
+nbproject/private/
+
+# ---------- Java / Maven ----------
+target/
+build/
+out/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+# keep Maven wrapper scripts/config: !mvnw, !mvnw.cmd, !.mvn/wrapper/maven-wrapper.properties
+
+# ---------- Gradle (if any) ----------
+.gradle/
+gradle-app.setting
+
+# ---------- Node / Next.js / Frontend ----------
+node_modules/
+.pnp
+.pnp.js
+.next/
+out/
+dist/
+build/
+.turbo/
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+coverage/
+.eslintcache
+.npm
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+
+# ---------- Env / Secrets ----------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.bak
+*.pem
+*.key
+
+# ---------- Logs & runtime ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# ---------- Tooling / analysis ----------
+.scannerwork/
+.sonar/
+
+# ---------- Misc / build artifacts ----------
+*.tgz
+*.tar.gz
+tmp/
+temp/
+.cache/

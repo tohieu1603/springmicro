@@ -1,0 +1,243 @@
+server:
+  port: 8080
+  forward-headers-strategy: native
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+          - id: auth-service-public
+            uri: lb://auth-service
+            predicates:
+            - Path=/api/v1/auth/login,/api/v1/auth/register,/api/v1/auth/refresh,/api/v1/auth/google
+          - id: auth-service-protected
+            uri: lb://auth-service
+            predicates:
+            - Path=/api/v1/auth/me,/api/v1/auth/logout,/api/v1/auth/change-password,/api/v1/users/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: user-profile-service
+            uri: lb://user-profile-service
+            predicates:
+            - Path=/api/v1/user-profiles/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: auth-service-api-docs
+            uri: lb://auth-service
+            predicates:
+            - Path=/v3/api-docs/auth-service
+            filters:
+            - RewritePath=/v3/api-docs/auth-service, /v3/api-docs
+          - id: catalog-service-public-reads
+            uri: lb://catalog-service
+            predicates:
+            - Path=/api/v1/products/**,/api/v1/categories/**,/api/v1/attrs/**,/api/v1/variants/**
+            - Method=GET
+          - id: catalog-service-writes
+            uri: lb://catalog-service
+            predicates:
+            - Path=/api/v1/products/**,/api/v1/categories/**,/api/v1/attrs/**,/api/v1/variants/**
+            - Method=POST,PUT,PATCH,DELETE
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: catalog-service-banners-public
+            uri: lb://catalog-service
+            predicates:
+            - Path=/api/v1/banners/active
+            - Method=GET
+          - id: catalog-service-banners-admin
+            uri: lb://catalog-service
+            predicates:
+            - Path=/api/v1/banners/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: catalog-service-api-docs
+            uri: lb://catalog-service
+            predicates:
+            - Path=/v3/api-docs/catalog-service
+            filters:
+            - RewritePath=/v3/api-docs/catalog-service, /v3/api-docs
+          - id: cart-service
+            uri: lb://cart-service
+            predicates:
+            - Path=/api/v1/cart/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: order-service-track-public
+            uri: lb://order-service
+            predicates:
+            - Path=/api/v1/orders/track/**
+            - Method=GET
+          - id: order-service
+            uri: lb://order-service
+            predicates:
+            - Path=/api/v1/orders/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: payment-service-webhook
+            uri: lb://payment-service
+            predicates:
+            - Path=/api/v1/payments/sepay/webhook,/api/v1/payments/momo/webhook
+            - Method=POST
+          - id: payment-service-methods
+            uri: lb://payment-service
+            predicates:
+            - Path=/api/v1/payments/methods
+            - Method=GET
+          - id: payment-service
+            uri: lb://payment-service
+            predicates:
+            - Path=/api/v1/payments/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: flash-sale-service-public
+            uri: lb://flash-sale-service
+            predicates:
+            - Path=/api/v1/flash-sales/active,/api/v1/flash-sales/{id},/api/v1/flash-sales/{id}/availability
+            - Method=GET
+          - id: flash-sale-service
+            uri: lb://flash-sale-service
+            predicates:
+            - Path=/api/v1/flash-sales/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: search-service-public
+            uri: lb://search-service
+            predicates:
+            - Path=/api/v1/search,/api/v1/search/suggest
+            - Method=GET,POST
+          - id: search-service-admin
+            uri: lb://search-service
+            predicates:
+            - Path=/api/v1/search/index/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: voucher-service-public
+            uri: lb://voucher-service
+            predicates:
+            - Path=/api/v1/vouchers/active,/api/v1/vouchers/code/**
+          - id: voucher-service-protected
+            uri: lb://voucher-service
+            predicates:
+            - Path=/api/v1/vouchers/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: analytics-service
+            uri: lb://analytics-service
+            predicates:
+            - Path=/api/v1/analytics/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: notification-service
+            uri: lb://notification-service
+            predicates:
+            - Path=/api/v1/notifications/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: inventory-service-internal
+            uri: lb://inventory-service
+            predicates:
+            - Path=/api/v1/inventory/reserve,/api/v1/inventory/confirm,/api/v1/inventory/release
+            - Method=POST
+          - id: inventory-service
+            uri: lb://inventory-service
+            predicates:
+            - Path=/api/v1/inventory/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: shipping-service-tracking
+            uri: lb://shipping-service
+            predicates:
+            - Path=/api/v1/shipments/tracking/**
+            - Method=GET
+          - id: shipping-service
+            uri: lb://shipping-service
+            predicates:
+            - Path=/api/v1/shipments/**
+            filters:
+            - name: JwtAuthenticationFilter
+          - id: shipping-fee-public
+            uri: lb://shipping-service
+            predicates:
+            - Path=/api/v1/shipping/**
+          default-filters:
+          - RemoveRequestHeader=X-User-Id
+          - RemoveRequestHeader=X-User-Name
+          - RemoveRequestHeader=X-Token-Id
+          - RemoveRequestHeader=X-Token-Version
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          # Global per-user rate limit (Redis-backed token bucket).
+          # Authenticated calls keyed by X-User-Id; anonymous calls keyed by IP
+          # (via userKeyResolver fallback in RateLimiterConfig.java).
+          - name: RequestRateLimiter
+            args:
+              key-resolver: '#{@userKeyResolver}'
+              redis-rate-limiter.replenishRate: ${GW_RATE_REPLENISH:50}    # 50 req/s sustained
+              redis-rate-limiter.burstCapacity: ${GW_RATE_BURST:100}        # 100 req burst
+              redis-rate-limiter.requestedTokens: 1
+  threads:
+    virtual:
+      enabled: true
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://admin:admin123@localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+jwt:
+  secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-please-32chars}
+resilience4j:
+  circuitbreaker:
+    instances:
+      defaultCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+  timelimiter:
+    instances:
+      defaultCircuitBreaker:
+        timeoutDuration: 3s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway,prometheus
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: when-authorized
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+    - name: Auth Service
+      url: /v3/api-docs/auth-service
+  api-docs:
+    enabled: true
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    com.hieu.api_gateway: DEBUG
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{30} - %msg%n'

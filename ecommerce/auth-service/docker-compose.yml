@@ -1,0 +1,106 @@
+# Self-contained local stack for auth-service.
+#
+#   Infra only (Postgres + Redis + Kafka) — run the app from your IDE / mvnw:
+#       docker compose up -d
+#
+#   Full stack incl. the auth-service container (built from ./Dockerfile):
+#       docker compose --profile app up -d --build
+#
+# Host port map: Postgres 5433, Redis 6379, Kafka 29092 (host) / 9092 (in-network),
+# auth-service HTTP 8081, gRPC 9091. These match auth-service/.env so a host-run app
+# needs no overrides except KAFKA_BOOTSTRAP=localhost:29092.
+
+name: auth-service-local
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authuser -d authdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: auth-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  kafka:
+    image: apache/kafka:3.8.1
+    container_name: auth-kafka
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # Optional: the auth-service itself, built from the fixed multi-stage Dockerfile.
+  # Build context is the parent dir because the Dockerfile also compiles common-lib.
+  auth-service:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/authdb
+      DB_USER: authuser
+      DB_PASSWORD: authpass
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      KAFKA_BOOTSTRAP: kafka:9092
+      JWT_SECRET: dev-local-hmac-secret-do-not-use-in-prod-0123456789
+      JWT_ISSUER: hieu.com
+      AUTH_COOKIE_SECURE: "false"
+      FLYWAY_ENABLED: "true"
+      JPA_DDL: validate
+      SERVER_PORT: "8081"
+      GRPC_PORT: "9091"
+      # No Eureka in the local stack.
+      EUREKA_CLIENT_ENABLED: "false"
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+
+volumes:
+  auth-postgres-data:

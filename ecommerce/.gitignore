@@ -1,0 +1,121 @@
+# ===== Java / Maven / Gradle =====
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# ===== Spring Boot =====
+*.log
+spring-shell.log
+application-local.yml
+application-local.yaml
+application-local.properties
+application-secrets.yml
+application-secrets.yaml
+application-secrets.properties
+
+# ===== IDE: IntelliJ IDEA =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.shelf/
+
+# ===== IDE: Eclipse =====
+.metadata/
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# ===== IDE: VS Code =====
+.vscode/
+*.code-workspace
+
+# ===== IDE: NetBeans =====
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ===== OS Files =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===== Logs =====
+logs/
+*.log
+*.log.*
+log/
+
+# ===== Environment & Secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+secrets/
+
+# ===== Docker =====
+docker-compose.override.yml
+.docker/
+
+# ===== Node (if any frontend/tooling) =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== Temporary / Scratch =====
+scratch/
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
+
+# ===== Coverage / Reports =====
+coverage/
+*.lcov
+.nyc_output/
+jacoco.exec
+*.exec
+
+# ===== Claude / AI tooling =====
+.claude/
+.aider*
